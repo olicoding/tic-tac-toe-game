@@ -28,9 +28,11 @@ body {
   border-radius: 10px;
   display: grid;
   grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+  overflow: hidden;
 }
 
 .square {
+  padding: 0;
   background: transparent;
   color: #fff;
   border: 1px solid #999;
