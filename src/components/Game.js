@@ -10,7 +10,7 @@ function Game() {
     document.querySelector(".winner").style.visibility = "hidden";
     const fields = document.querySelectorAll("button");
     fields.forEach((field) => (field.innerHTML = ""));
-    // setWinner("");
+
     setPlayer("X");
     setBoard({
       0: "",
