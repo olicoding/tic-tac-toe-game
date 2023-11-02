@@ -1,13 +1,7 @@
-## Jogo da Velha / Tic-Tac-Toe
+## Tic-Tac-Toe - Jogo da Velha
 
-live: https://tic-tac-toe-game-olicoding.vercel.app/ 
+live: https://tic-tac-toe-game-olicoding.vercel.app/
 
-Having a virtual Christmas party with my family, came the idea to send my 10 yrs old little nephew, this tic-tac-toe game as a virtual present. It is simple, but made with love.
+Last year, celebratin Christmas virtually with my family, came the idea to send my 10 yrs nephew this tic-tac-toe game as a present. It is simple, but made with love.
 
-Credits to my bootcamp at Digital Career Institute, who challenged me with this exercise a few weeks ago, in which I've implemented the JavaScript logic and functionality.
-
-**Future Plans**
-
-- Improve UI / responsiveness
-- Add animations
-- Add sounds
+This year, I'll make some improvements by creating an AI adversary, unsing the Minimax algotythm.
