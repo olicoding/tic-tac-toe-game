@@ -1,42 +1,75 @@
 import { useContext } from "react";
 import { Context } from "../context/ContextProvider";
-import Board from "./Board";
+import Square from "./Square";
 
 function Game() {
-  const { setPlayer, winner, setWinner, setBoard } = useContext(Context);
+  const { player, setPlayer, winner, setWinner, board, setBoard } =
+    useContext(Context);
+
+  const calculateWinner = (squares) => {
+    const lines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+
+    for (const line of lines) {
+      const [a, b, c] = line;
+      if (
+        squares[a] &&
+        squares[a] === squares[b] &&
+        squares[a] === squares[c]
+      ) {
+        return squares[a];
+      }
+    }
+
+    return null;
+  };
 
   const handleReset = () => {
-    document.querySelector(".status").style.visibility = "visible";
-    document.querySelector(".winner").style.visibility = "hidden";
-    const fields = document.querySelectorAll("button");
-    fields.forEach((field) => (field.innerHTML = ""));
-
+    setBoard(Array(9).fill(null));
     setPlayer("X");
-    setBoard({
-      0: "",
-      1: "",
-      2: "",
-      3: "",
-      4: "",
-      5: "",
-      6: "",
-      7: "",
-      8: "",
-    });
+    setWinner(null);
   };
 
   return (
-    <article className="game container mt-5">
-      <section className="row">
-        <div className="col-sm-8 game-board">
-          <Board />
+    <article className="game">
+      <section>
+        <div className="game-info">
+          <div className="status h2 text-center">Player: {player}</div>
         </div>
-        <div className="col-sm-4 game-info">
-          <p className="h2 restart" onClick={handleReset}>
-            restart
-          </p>
-          <h2 className="h2 winner">{winner && `${winner} wins 🎉`}</h2>
+        <div
+          className={`game-board ${
+            winner ? `${winner.toLowerCase()}-wins` : ""
+          }`}
+        >
+          <Square squareNum={0} calculateWinner={calculateWinner} />
+          <Square squareNum={1} calculateWinner={calculateWinner} />
+          <Square squareNum={2} calculateWinner={calculateWinner} />
+          <Square squareNum={3} calculateWinner={calculateWinner} />
+          <Square squareNum={4} calculateWinner={calculateWinner} />
+          <Square squareNum={5} calculateWinner={calculateWinner} />
+          <Square squareNum={6} calculateWinner={calculateWinner} />
+          <Square squareNum={7} calculateWinner={calculateWinner} />
+          <Square squareNum={8} calculateWinner={calculateWinner} />
         </div>
+        {winner || board.every((square) => square) ? (
+          <div className="game-result">
+            <h2 className="h2 winner">{`${
+              winner === null ? "draw" : winner + " wins 🎉"
+            }`}</h2>
+
+            <p className="restart" onClick={handleReset}>
+              Restart
+            </p>
+          </div>
+        ) : null}
       </section>
     </article>
   );

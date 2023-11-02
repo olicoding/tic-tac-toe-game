@@ -4,18 +4,8 @@ export const Context = createContext();
 
 function ContextProvider({ children }) {
   const [player, setPlayer] = useState("X");
-  const [winner, setWinner] = useState("");
-  const [board, setBoard] = useState({
-    0: "",
-    1: "",
-    2: "",
-    3: "",
-    4: "",
-    5: "",
-    6: "",
-    7: "",
-    8: "",
-  });
+  const [winner, setWinner] = useState(null);
+  const [board, setBoard] = useState(Array(9).fill(null));
 
   return (
     <Context.Provider
