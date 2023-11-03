@@ -2,7 +2,8 @@ import { useContext, useEffect } from "react";
 import { Context } from "../context/ContextProvider";
 
 function Minimax() {
-  const { player, aiMode, board, setBoard, winner } = useContext(Context);
+  const { player, aiMode, board, setBoard, winner, calculateWinner } =
+    useContext(Context);
   const computerPlayer = player === "X" ? "O" : "X";
 
   const getBestMove = (newBoard, currentPlayer) => {
@@ -34,30 +35,40 @@ function Minimax() {
 
       if (emptySquares.length % 2 === 0 && !winner) {
         const newBoard = [...board];
-        const moves = [];
 
-        newBoard.forEach((cell, index) => {
-          if (!cell) {
-            const child = [...newBoard];
-            child[index] = computerPlayer;
-            const score = -getBestMove(child, player);
-            moves.push({ move: index, score });
+        for (let index = 0; index < newBoard.length; index++) {
+          if (!newBoard[index]) {
+            newBoard[index] = computerPlayer;
+            if (calculateWinner(newBoard)) {
+              setBoard(newBoard);
+              return;
+            }
+            newBoard[index] = null;
           }
-        });
+        }
 
-        if (moves.length === 0) return;
+        for (let index = 0; index < newBoard.length; index++) {
+          if (!newBoard[index]) {
+            newBoard[index] = player;
+            if (calculateWinner(newBoard)) {
+              newBoard[index] = computerPlayer;
+              setBoard(newBoard);
+              return;
+            }
+            newBoard[index] = null;
+          }
+        }
 
-        const bestMove = moves.reduce(
-          (best, move) => {
-            if (move.score > best.score) return move;
-            return best;
-          },
-          { move: null, score: -Infinity }
-        );
+        const moves = [];
+        for (let index = 0; index < newBoard.length; index++) {
+          if (!newBoard[index]) {
+            moves.push(index);
+          }
+        }
 
-        if (bestMove.move !== null) {
-          newBoard[bestMove.move] = computerPlayer;
-
+        if (moves.length > 0) {
+          const randomIndex = moves[Math.floor(Math.random() * moves.length)];
+          newBoard[randomIndex] = computerPlayer;
           setBoard(newBoard);
         }
       }

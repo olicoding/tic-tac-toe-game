@@ -1,15 +1,11 @@
-## Tic-Tac-Toe 
+## Tic-Tac-Toe
 
 live: https://tic-tac-toe-game-olicoding.vercel.app/
 
-Last year, celebratin Christmas virtually with my family, came the idea to send my 10 yr old nephew a tic-tac-toe game as a present. It is simple, but made with love.
+Last year, I made a basic tic-tac-toe game as a gift for my 10 year old nephew, and we had a blast playing it. This year I've leveled up the game and now is possible to play with a friend or challenge an AI opponent!
 
-This year, I'll make some improvements by creating an AI adversary, implementing the Minimax algotythm. I've started with improving the UX/UI and refactoring the code from a lot of Vanilla JavaScript logic to a proper React optimized approach. 
+I've also improved the UX/UI for a modern feel. Technically, I've moved from using a lot of Vanilla JavaScript to a more efficient React based approach.
 
-Here's the current look:
+These simple yet exciting changes have significantly improved the overall experience, and allowed me to practice important concepts and improve my skills.
 
-![x-wins](https://github.com/olicoding/tic-tac-toe-game/assets/92989835/fa569f8b-87ef-457e-ba91-2d909a9225f3)
-
-![o-wins](https://github.com/olicoding/tic-tac-toe-game/assets/92989835/864328b0-a360-42ec-8dc5-716bb0c3e737)
-
-![draw](https://github.com/olicoding/tic-tac-toe-game/assets/92989835/35d49ca8-b1e1-4890-9eb0-a8221e72c47b)
+While it's not yet the final version, the current AI implemented is quite simple - a rule-based approach with some strategic decision making. It's not the super smart AI you might have heard out there, but it's a step in that direction. Next, I'll be implementing depth and tree structure, making it even smarter. Stay tuned!
