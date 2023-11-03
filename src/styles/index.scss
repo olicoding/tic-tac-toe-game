@@ -43,12 +43,57 @@ body {
   font: normal 1.4rem/1.5 "Roboto", sans-serif;
 }
 
+.section-header {
+  width: 30vw;
+  min-width: 230px;
+  min-height: 100px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  @media (min-width: 500px) {
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
 .game {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 2em;
+  // margin-top: 1em;
+}
+
+.game-mode,
+.game-info {
+  min-height: 70px;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 0.4em 0;
+
+  .select-options-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    input {
+      margin-right: 0.3em;
+    }
+  }
 }
 
 .game-result {
@@ -67,6 +112,35 @@ body {
   font-size: clamp(1.8rem, 2.5vw, 3rem);
   width: fit-content;
   margin: 0 auto;
+}
+
+.player-selection {
+  margin: 0.5em 1em;
+  display: flex;
+  gap: 15px;
+
+  button {
+    // cursor: pointer;
+    // padding: 0 1em;
+    padding: 0.2em 1.2em;
+    // font-size: clamp(1.6rem, 2.5vw, 2.4rem);
+    color: map-get($colors, white);
+    background-color: map-get($colors, dark-grey);
+    border-radius: $border-radius;
+    cursor: pointer;
+    display: grid;
+
+    &:hover {
+      transition: background-color 0.3s ease-in-out;
+      color: map-get($colors, golden);
+    }
+
+    &:active {
+      transition: unset;
+      color: map-get($colors, white);
+      background-color: map-get($colors, golden);
+    }
+  }
 }
 
 .restart {

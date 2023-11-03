@@ -2,25 +2,18 @@ import { useContext } from "react";
 import { Context } from "../context/ContextProvider";
 
 function Square(props) {
-  const { player, setPlayer, board, setBoard, winner, setWinner } =
+  const { player, friendsModePlayer, board, winner, handleUserMove } =
     useContext(Context);
 
-  const { squareNum, calculateWinner } = props;
+  const { squareNum } = props;
 
   const handleClick = () => {
-    if (board[squareNum] || winner) {
+    try {
+      if ((player || friendsModePlayer) && !board[squareNum] && !winner) {
+        handleUserMove(squareNum);
+      }
+    } catch (_) {
       return;
-    }
-
-    const newBoard = [...board];
-    newBoard[squareNum] = player;
-    setBoard(newBoard);
-
-    const newWinner = calculateWinner(newBoard);
-    if (newWinner) {
-      setWinner(newWinner);
-    } else {
-      setPlayer(player === "X" ? "O" : "X");
     }
   };
 

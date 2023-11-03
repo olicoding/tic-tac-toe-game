@@ -1,63 +1,104 @@
 import { useContext } from "react";
 import { Context } from "../context/ContextProvider";
 import Square from "./Square";
+import Minimax from "./Minimax";
 
 function Game() {
-  const { player, setPlayer, winner, setWinner, board, setBoard } =
-    useContext(Context);
+  const {
+    player,
+    setPlayer,
+    friendsModePlayer,
+    setFriendsModePlayer,
+    setWinner,
+    aiMode,
+    setAIMode,
+    board,
+    setBoard,
+    handleUserMove,
+    winner,
+  } = useContext(Context);
 
-  const calculateWinner = (squares) => {
-    const lines = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6],
-    ];
+  const handleGameModeChange = () => {
+    setAIMode(!aiMode);
+    handleReset();
+  };
 
-    for (const line of lines) {
-      const [a, b, c] = line;
-      if (
-        squares[a] &&
-        squares[a] === squares[b] &&
-        squares[a] === squares[c]
-      ) {
-        return squares[a];
-      }
+  const handlePlayerSelection = (selectedPlayer) => {
+    if (aiMode && player === null) {
+      setPlayer(selectedPlayer);
     }
 
-    return null;
+    if (!aiMode && friendsModePlayer === null)
+      setFriendsModePlayer(selectedPlayer);
   };
 
   const handleReset = () => {
     setBoard(Array(9).fill(null));
-    setPlayer("X");
+    setFriendsModePlayer(null);
+    setPlayer(null);
     setWinner(null);
   };
 
   return (
     <article className="game">
-      <section>
-        <div className="game-info">
-          <div className="status h2 text-center">Player: {player}</div>
+      <section className="section-header">
+        <div className="game-mode">
+          <div className="select-options-container">
+            Play against:
+            <label>
+              <input
+                type="radio"
+                name="gameMode"
+                value="Friend"
+                checked={!aiMode}
+                onChange={handleGameModeChange}
+              />
+              Person
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="gameMode"
+                value="AI"
+                checked={aiMode}
+                onChange={handleGameModeChange}
+              />
+              AI
+            </label>
+          </div>
         </div>
+
+        <div className="game-info">
+          {!winner && (
+            <div className="status">
+              {player || friendsModePlayer
+                ? `Player turn: ${player || friendsModePlayer}`
+                : "Play as:"}
+            </div>
+          )}
+          {!player && !friendsModePlayer && (
+            <div className="player-selection">
+              <button onClick={() => handlePlayerSelection("X")}>X</button>
+              <button onClick={() => handlePlayerSelection("O")}>O</button>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="section-game">
         <div
           className={`game-board ${
             winner ? `${winner.toLowerCase()}-wins` : ""
           }`}
         >
-          <Square squareNum={0} calculateWinner={calculateWinner} />
-          <Square squareNum={1} calculateWinner={calculateWinner} />
-          <Square squareNum={2} calculateWinner={calculateWinner} />
-          <Square squareNum={3} calculateWinner={calculateWinner} />
-          <Square squareNum={4} calculateWinner={calculateWinner} />
-          <Square squareNum={5} calculateWinner={calculateWinner} />
-          <Square squareNum={6} calculateWinner={calculateWinner} />
-          <Square squareNum={7} calculateWinner={calculateWinner} />
-          <Square squareNum={8} calculateWinner={calculateWinner} />
+          {board.map((value, index) => (
+            <Square
+              key={index}
+              squareNum={index}
+              value={value}
+              onClick={handleUserMove}
+            />
+          ))}
         </div>
         {winner || board.every((square) => square) ? (
           <div className="game-result">
@@ -71,6 +112,8 @@ function Game() {
           </div>
         ) : null}
       </section>
+
+      <Minimax />
     </article>
   );
 }

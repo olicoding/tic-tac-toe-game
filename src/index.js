@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 import ContextProvider from "./context/ContextProvider";
 import Game from "./components/Game";
 import "./styles/index.scss";
