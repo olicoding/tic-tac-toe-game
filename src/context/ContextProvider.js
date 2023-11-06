@@ -10,53 +10,61 @@ function ContextProvider({ children }) {
   const [winner, setWinner] = useState(null);
 
   const calculateWinner = (squares) => {
-    const lines = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6],
-    ];
+    try {
+      const lines = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+      ];
 
-    for (const line of lines) {
-      const [a, b, c] = line;
-      if (
-        squares[a] &&
-        squares[a] === squares[b] &&
-        squares[a] === squares[c]
-      ) {
-        return squares[a];
+      for (const line of lines) {
+        const [a, b, c] = line;
+        if (
+          squares[a] &&
+          squares[a] === squares[b] &&
+          squares[a] === squares[c]
+        ) {
+          return squares[a];
+        }
       }
-    }
 
-    return null;
+      return null;
+    } catch (error) {
+      console.error("Error in calculateWinner:", error.message);
+    }
   };
 
   const handleUserMove = (squareNum) => {
-    if (!board[squareNum] && !winner) {
-      const newBoard = [...board];
-      newBoard[squareNum] = player || friendsModePlayer;
+    try {
+      if (!board[squareNum] && !winner) {
+        const newBoard = [...board];
+        newBoard[squareNum] = player || friendsModePlayer;
 
-      const newWinner = calculateWinner(newBoard);
-      if (newWinner) {
-        setWinner(newWinner);
-        setBoard(newBoard);
-      } else {
-        setBoard(newBoard);
+        const newWinner = calculateWinner(newBoard);
+        if (newWinner) {
+          setWinner(newWinner);
+          setBoard(newBoard);
+        } else {
+          setBoard(newBoard);
+        }
+
+        if (friendsModePlayer)
+          setFriendsModePlayer(friendsModePlayer === "X" ? "O" : "X");
       }
-
-      if (friendsModePlayer)
-        setFriendsModePlayer(friendsModePlayer === "X" ? "O" : "X");
+    } catch (error) {
+      console.error("Error in handleUserMove:", error);
     }
   };
 
   useEffect(() => {
     const newWinner = calculateWinner(board);
     if (newWinner) setWinner(newWinner);
-  }, [board, winner]);
+  }, [board]);
 
   return (
     <Context.Provider

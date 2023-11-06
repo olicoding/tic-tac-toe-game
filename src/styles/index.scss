@@ -133,7 +133,7 @@ body {
     }
 
     &:active {
-      color: map-get($colors, white);
+      color: map-get($colors, dark-grey);
       background-color: map-get($colors, golden);
     }
 
@@ -158,7 +158,6 @@ body {
   }
 
   &:active {
-    color: map-get($colors, white);
     background-color: map-get($colors, golden);
   }
 }

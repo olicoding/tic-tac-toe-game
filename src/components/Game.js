@@ -3,19 +3,39 @@ import { Context } from "../context/ContextProvider";
 import Square from "./Square";
 import Minimax from "./Minimax";
 
-const winMessages = ["you rock! 💪", "amazing win! 🚀", "victory is yours! 🏆"];
-const loseMessages = [
-  "AI wins 🙄",
-  "Let's try that again 😕",
-  "AI is victorious 🤖",
-];
-const drawMessages = [
-  "It's a draw! 😐",
-  "A tie game! 👔",
-  "No one wins this time! 😅",
-];
-
 function Game() {
+  const winMessages = [
+    "you rock! 💪",
+    "amazing win! 🚀",
+    "victory is yours! 🏆",
+    "Unstoppable! 🏅",
+    "You're on fire! 🔥",
+    "Legendary victory! 🌟",
+    "Majestic win! 🏆",
+    "Absolute domination! 💥",
+    "A triumph of excellence! 🎉",
+  ];
+  const loseMessages = [
+    "AI wins 🙄",
+    "Let's try that again 😕",
+    "AI is victorious 🤖",
+    "AI supremacy! 🤖",
+    "A formidable opponent! 🧠",
+    "AI's tactical brilliance! 🌐",
+    "AI's strategic mastery! 📈",
+    "AI's victory is undeniable! 🤯",
+  ];
+  const drawMessages = [
+    "It's a draw! 😐",
+    "A tie game! 👔",
+    "No one wins this time! 😅",
+    "Stalemate reached! ♻️",
+    "A deadlock! 🔒",
+    "Balance is maintained! ⚖️",
+    "No clear winner! 🤝",
+    "A tie for the ages! 👔",
+    "Two forces in equilibrium! ⚖️",
+  ];
   const {
     player,
     setPlayer,
@@ -38,19 +58,26 @@ function Game() {
   };
 
   const handlePlayerSelection = (selectedPlayer) => {
-    console.log(winner);
-    handleReset();
+    try {
+      handleReset();
 
-    if (aiMode) {
-      setPlayer(selectedPlayer);
-    } else {
-      setFriendsModePlayer(selectedPlayer);
+      if (aiMode) {
+        setPlayer(selectedPlayer);
+      } else {
+        setFriendsModePlayer(selectedPlayer);
+      }
+    } catch (error) {
+      console.error("Error in handlePlayerSelection:", error.message);
     }
   };
 
   const handleReset = () => {
-    setBoard(Array(9).fill(null));
-    setWinner(null);
+    try {
+      setBoard(Array(9).fill(null));
+      setWinner(null);
+    } catch (error) {
+      console.error("Error in handleReset:", error.message);
+    }
   };
 
   const getRandomMessage = (messages) => {
