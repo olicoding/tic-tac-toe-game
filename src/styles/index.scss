@@ -73,7 +73,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  margin: 0.4em 0;
+  gap: 12px;
 
   .select-options-container {
     display: flex;
@@ -96,64 +96,68 @@ body {
 
 .game-result {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1em;
-  margin-top: 1em;
-
-  @media (min-width: 500px) {
-    gap: 2em;
-  }
+  gap: 0.5em;
 }
 
-.h2 {
+.restart {
   font-size: clamp(1.8rem, 2.5vw, 3rem);
   width: fit-content;
   margin: 0 auto;
 }
 
 .player-selection {
-  margin: 0.5em 1em;
+  margin: 0 auto;
   display: flex;
   gap: 15px;
 
-  button {
-    padding: 0.2em 1.2em;
+  .player-button {
+    padding: 0.1em 1em;
     color: map-get($colors, white);
     background-color: map-get($colors, dark-grey);
     border-radius: $border-radius;
     cursor: pointer;
     display: grid;
+    transition: background-color 0.3s ease-in-out, border 0.3s ease-in-out;
+
+    &.selected {
+      border: 2px solid map-get($colors, golden);
+      pointer-events: none;
+      transition: none;
+    }
 
     &:hover {
-      transition: background-color 0.3s ease-in-out;
-      color: map-get($colors, golden);
+      background-color: map-get($colors, golden);
     }
 
     &:active {
-      transition: unset;
       color: map-get($colors, white);
       background-color: map-get($colors, golden);
+    }
+
+    &.unselected {
+      opacity: 0.2;
     }
   }
 }
 
 .restart {
-  padding: 0.2em 1.2em;
-  font-size: clamp(1.6rem, 2.5vw, 2.4rem);
+  padding: 0.1em 0.8em;
+  font-size: clamp(1.6rem, 2.5vw, 1.6rem);
   color: map-get($colors, white);
   background-color: map-get($colors, dark-grey);
   border-radius: $border-radius;
   cursor: pointer;
   display: grid;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 
   &:hover {
-    transition: background-color 0.3s ease-in-out;
     color: map-get($colors, golden);
   }
 
   &:active {
-    transition: unset;
     color: map-get($colors, white);
     background-color: map-get($colors, golden);
   }
@@ -174,6 +178,11 @@ body {
   border: 6px solid map-get($colors, black);
   border-radius: 8px;
   box-shadow: map-get($shadows, default);
+  transition: box-shadow 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.game-board.no-player {
+  opacity: 0.3;
 }
 
 .game-board.x-wins {
@@ -196,7 +205,6 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
 
   &:hover {
     background-color: map-get($colors, grey);
@@ -207,7 +215,8 @@ body {
   }
 }
 
-.h2.winner {
+.winner {
+  font-size: clamp(1.6rem, 2.5vw, 2rem);
   text-align: center;
-  margin: 1rem;
+  margin: 0 0.5em;
 }

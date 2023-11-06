@@ -3,6 +3,18 @@ import { Context } from "../context/ContextProvider";
 import Square from "./Square";
 import Minimax from "./Minimax";
 
+const winMessages = ["you rock! 💪", "amazing win! 🚀", "victory is yours! 🏆"];
+const loseMessages = [
+  "AI wins 🙄",
+  "Let's try that again 😕",
+  "AI is victorious 🤖",
+];
+const drawMessages = [
+  "It's a draw! 😐",
+  "A tie game! 👔",
+  "No one wins this time! 😅",
+];
+
 function Game() {
   const {
     player,
@@ -20,23 +32,30 @@ function Game() {
 
   const handleGameModeChange = () => {
     setAIMode(!aiMode);
+    setFriendsModePlayer(null);
+    setPlayer(null);
     handleReset();
   };
 
   const handlePlayerSelection = (selectedPlayer) => {
-    if (aiMode && player === null) {
-      setPlayer(selectedPlayer);
-    }
+    console.log(winner);
+    handleReset();
 
-    if (!aiMode && friendsModePlayer === null)
+    if (aiMode) {
+      setPlayer(selectedPlayer);
+    } else {
       setFriendsModePlayer(selectedPlayer);
+    }
   };
 
   const handleReset = () => {
     setBoard(Array(9).fill(null));
-    setFriendsModePlayer(null);
-    setPlayer(null);
     setWinner(null);
+  };
+
+  const getRandomMessage = (messages) => {
+    const randomIndex = Math.floor(Math.random() * messages.length);
+    return messages[randomIndex];
   };
 
   return (
@@ -53,7 +72,7 @@ function Game() {
                 checked={!aiMode}
                 onChange={handleGameModeChange}
               />
-              Person
+              Friend
             </label>
             <label>
               <input
@@ -69,19 +88,41 @@ function Game() {
         </div>
 
         <div className="game-info">
-          {!winner && (
-            <div className="status">
-              {player || friendsModePlayer
-                ? `Player turn: ${player || friendsModePlayer}`
-                : "Play as:"}
-            </div>
-          )}
-          {!player && !friendsModePlayer && (
-            <div className="player-selection">
-              <button onClick={() => handlePlayerSelection("X")}>X</button>
-              <button onClick={() => handlePlayerSelection("O")}>O</button>
-            </div>
-          )}
+          {winner
+            ? ""
+            : friendsModePlayer || player
+            ? "Player turn:"
+            : "Choose your player"}
+          <div className="player-selection">
+            <button
+              className={`player-button ${
+                aiMode && player === "X"
+                  ? "selected"
+                  : (!winner && (player || friendsModePlayer)) === "X"
+                  ? "selected"
+                  : !player && !friendsModePlayer && !winner
+                  ? ""
+                  : "unselected"
+              }`}
+              onClick={() => handlePlayerSelection("X")}
+            >
+              X
+            </button>
+            <button
+              className={`player-button ${
+                aiMode && player === "O"
+                  ? "selected"
+                  : (!winner && (player || friendsModePlayer)) === "O"
+                  ? "selected"
+                  : !player && !friendsModePlayer && !winner
+                  ? ""
+                  : "unselected"
+              }`}
+              onClick={() => handlePlayerSelection("O")}
+            >
+              O
+            </button>
+          </div>
         </div>
       </section>
 
@@ -89,7 +130,7 @@ function Game() {
         <div
           className={`game-board ${
             winner ? `${winner.toLowerCase()}-wins` : ""
-          }`}
+          } ${player || friendsModePlayer ? "" : "no-player"}`}
         >
           {board.map((value, index) => (
             <Square
@@ -102,9 +143,19 @@ function Game() {
         </div>
         {winner || board.every((square) => square) ? (
           <div className="game-result">
-            <h2 className="h2 winner">{`${
-              winner === null ? "draw" : winner + " wins 🎉"
-            }`}</h2>
+            <div className="winner">
+              {`${
+                winner === null
+                  ? !aiMode
+                    ? "draw"
+                    : getRandomMessage(drawMessages)
+                  : !aiMode
+                  ? winner + " wins 🎉"
+                  : winner === player
+                  ? getRandomMessage(winMessages)
+                  : getRandomMessage(loseMessages)
+              }`}
+            </div>
 
             <p className="restart" onClick={handleReset}>
               Restart
