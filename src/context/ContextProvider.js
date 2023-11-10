@@ -3,12 +3,15 @@ import { createContext, useEffect, useState } from "react";
 export const Context = createContext();
 
 function ContextProvider({ children }) {
-  const [board, setBoard] = useState(Array(9).fill(null));
-  const [playerInFriendsMode, setPlayerInFriendsMode] = useState(null);
-  const [playerInAIMode, setPlayerInAIMode] = useState(null);
-  const [currentTurn, setCurrentTurn] = useState(null);
-  const [aiMode, setAIMode] = useState(false);
-  const [winner, setWinner] = useState(null);
+  const [gameState, setGameState] = useState({
+    board: Array(9).fill(null),
+    winner: null,
+    draw: false,
+    playerInFriendsMode: null,
+    playerInAIMode: null,
+    currentTurn: null,
+    aiMode: false,
+  });
 
   const calculateWinner = (squares) => {
     try {
@@ -33,7 +36,6 @@ function ContextProvider({ children }) {
           return squares[a];
         }
       }
-
       return null;
     } catch (error) {
       console.error("Error in calculateWinner:", error.message);
@@ -42,24 +44,24 @@ function ContextProvider({ children }) {
 
   const handleUserMove = (squareNum) => {
     try {
-      if (!board[squareNum] && !winner) {
-        const newBoard = [...board];
-        newBoard[squareNum] = playerInAIMode || playerInFriendsMode;
-
+      if (!gameState.board[squareNum] && !gameState.winner && !gameState.draw) {
+        const newBoard = [...gameState.board];
+        newBoard[squareNum] = gameState.currentTurn;
+        const nextTurn = gameState.currentTurn === "X" ? "O" : "X";
         const newWinner = calculateWinner(newBoard);
-        if (newWinner) {
-          setWinner(newWinner);
-          setBoard(newBoard);
-        } else {
-          setBoard(newBoard);
-        }
+        const isDraw = !newWinner && newBoard.every((cell) => cell !== null);
 
-        if (aiMode) {
-          const nextTurn = currentTurn === "X" ? "O" : "X";
-          setCurrentTurn(nextTurn);
-        } else if (playerInFriendsMode) {
-          setPlayerInFriendsMode(playerInFriendsMode === "X" ? "O" : "X");
-        }
+        setGameState({
+          ...gameState,
+          board: newBoard,
+          draw: isDraw,
+          winner: newWinner,
+          currentTurn: newWinner || isDraw ? gameState.currentTurn : nextTurn,
+          playerInFriendsMode:
+            !gameState.aiMode && !newWinner
+              ? nextTurn
+              : gameState.playerInFriendsMode,
+        });
       }
     } catch (error) {
       console.error("Error in handleUserMove:", error);
@@ -67,25 +69,23 @@ function ContextProvider({ children }) {
   };
 
   useEffect(() => {
-    const newWinner = calculateWinner(board);
-    if (newWinner) setWinner(newWinner);
-  }, [board, playerInAIMode, currentTurn]);
+    if (!gameState.winner && !gameState.draw) {
+      const newWinner = calculateWinner(gameState.board);
+
+      if (newWinner && newWinner !== gameState.winner) {
+        setGameState((prevState) => ({
+          ...prevState,
+          winner: newWinner,
+        }));
+      }
+    }
+  }, [gameState.board]);
 
   return (
     <Context.Provider
       value={{
-        playerInAIMode,
-        setPlayerInAIMode,
-        board,
-        setBoard,
-        playerInFriendsMode,
-        setPlayerInFriendsMode,
-        aiMode,
-        setAIMode,
-        currentTurn,
-        setCurrentTurn,
-        winner,
-        setWinner,
+        gameState,
+        setGameState,
         handleUserMove,
         calculateWinner,
       }}

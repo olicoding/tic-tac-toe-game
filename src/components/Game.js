@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Context } from "../context/ContextProvider";
 import Square from "./Square";
 import Minimax from "./Minimax";
@@ -36,72 +36,154 @@ function Game() {
     "A tie for the ages! 👔",
     "Two forces in equilibrium! ⚖️",
   ];
-  const {
-    aiMode,
-    setAIMode,
-    setCurrentTurn,
-    playerInAIMode,
-    setPlayerInAIMode,
-    playerInFriendsMode,
-    setPlayerInFriendsMode,
-    handleUserMove,
-    board,
-    setBoard,
-    winner,
-    setWinner,
-  } = useContext(Context);
 
-  const handleGameModeChange = () => {
-    setAIMode(!aiMode);
-    setCurrentTurn(null);
-    setPlayerInFriendsMode(null);
-    setPlayerInAIMode(null);
-    handleReset();
-  };
+  const { gameState, setGameState, handleUserMove } = useContext(Context);
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const [resultMessage, setResultMessage] = useState("");
+  const [showResult, setShowResult] = useState(false);
 
   const handlePlayerSelection = (selectedPlayer) => {
     try {
       handleReset();
-
-      if (aiMode) {
-        setPlayerInAIMode(selectedPlayer);
-      } else {
-        setPlayerInFriendsMode(selectedPlayer);
-      }
-
-      setCurrentTurn(selectedPlayer);
+      setGameState((prevState) => ({
+        ...prevState,
+        currentTurn: selectedPlayer,
+        playerInAIMode: prevState.aiMode ? selectedPlayer : null,
+        playerInFriendsMode: !prevState.aiMode ? selectedPlayer : null,
+      }));
     } catch (error) {
       console.error("Error in handlePlayerSelection:", error.message);
     }
   };
 
+  const handleGameMode = () => {
+    try {
+      handleReset();
+      setGameState((prevState) => ({
+        ...prevState,
+        currentTurn: null,
+        playerInAIMode: null,
+        playerInFriendsMode: null,
+        aiMode: !prevState.aiMode,
+      }));
+    } catch (error) {
+      console.error("Error in handleGameMode:", error.message);
+    }
+  };
+
   const handleReset = () => {
     try {
-      setBoard(Array(9).fill(null));
-      setWinner(null);
+      setGameState((prevState) => ({
+        ...prevState,
+        board: Array(9).fill(null),
+        winner: null,
+        draw: false,
+      }));
     } catch (error) {
       console.error("Error in handleReset:", error.message);
     }
   };
 
-  const getRandomMessage = (messages) => {
-    const randomIndex = Math.floor(Math.random() * messages.length);
-    return messages[randomIndex];
+  const getGameInfo = () => {
+    try {
+      if (gameState.winner || gameState.draw) return "";
+
+      return gameState.playerInFriendsMode || gameState.playerInAIMode
+        ? ""
+        : "Choose a player";
+    } catch (error) {
+      console.error("Error in getGameInfo:", error.message);
+      return "";
+    }
   };
+
+  const getBtnClass = (player) => {
+    try {
+      const isSelected =
+        (gameState.aiMode && gameState.playerInAIMode === player) ||
+        (!gameState.winner &&
+          (gameState.playerInAIMode || gameState.playerInFriendsMode) ===
+            player);
+      const isUnselected =
+        !gameState.playerInAIMode &&
+        !gameState.playerInFriendsMode &&
+        !gameState.winner;
+      return `player-button ${
+        isSelected ? "selected" : isUnselected ? "" : "unselected"
+      }`;
+    } catch (error) {
+      console.error("Error in getBtnClass:", error.message);
+      return "";
+    }
+  };
+
+  const getBoardClass = () => {
+    try {
+      let classNames = "game-board";
+
+      if (gameState.winner || gameState.draw) {
+        classNames += " game-board-faded";
+      } else if (gameState.playerInAIMode || gameState.playerInFriendsMode) {
+        classNames += " game-board-active";
+      }
+
+      return classNames;
+    } catch (error) {
+      console.error("Error in getBoardClass:", error.message);
+      return "";
+    }
+  };
+
+  const getRandomMessage = (messages) => {
+    try {
+      const randomIndex = Math.floor(Math.random() * messages.length);
+      return messages[randomIndex];
+    } catch (error) {
+      console.error("Error in getRandomMessage:", error.message);
+      return "";
+    }
+  };
+
+  useEffect(() => {
+    const updateResultMessage = async () => {
+      if (gameState.winner || gameState.draw) {
+        await delay(400);
+
+        let message = "";
+        if (gameState.winner) {
+          message = gameState.aiMode
+            ? gameState.winner === gameState.playerInAIMode
+              ? getRandomMessage(winMessages)
+              : getRandomMessage(loseMessages)
+            : `${gameState.winner} wins !`;
+        } else if (gameState.draw) {
+          message = getRandomMessage(drawMessages);
+        }
+
+        setResultMessage(message);
+        setShowResult(true);
+      } else {
+        setResultMessage("");
+        setShowResult(false);
+      }
+    };
+
+    updateResultMessage();
+  }, [gameState.winner, gameState.draw]);
 
   return (
     <article className="game">
       <section className="section-header">
         <div className="game-mode">
           <div className="select-options-container">
-            Play against:
+            <p className="mode-options-title"> Play against:</p>
             <label>
               <input
                 type="radio"
                 name="gameMode"
                 value="Friends"
-                checked={!aiMode}
-                onChange={handleGameModeChange}
+                checked={!gameState.aiMode}
+                onChange={handleGameMode}
               />
               Friend
             </label>
@@ -110,8 +192,8 @@ function Game() {
                 type="radio"
                 name="gameMode"
                 value="AI"
-                checked={aiMode}
-                onChange={handleGameModeChange}
+                checked={gameState.aiMode}
+                onChange={handleGameMode}
               />
               AI
             </label>
@@ -119,36 +201,16 @@ function Game() {
         </div>
 
         <div className="game-info">
-          {winner
-            ? ""
-            : playerInFriendsMode || playerInAIMode
-            ? "Player turn:"
-            : "Choose your player"}
+          <div className="game-info-title">{getGameInfo()}</div>
           <div className="player-selection">
             <button
-              className={`player-button ${
-                aiMode && playerInAIMode === "X"
-                  ? "selected"
-                  : (!winner && (playerInAIMode || playerInFriendsMode)) === "X"
-                  ? "selected"
-                  : !playerInAIMode && !playerInFriendsMode && !winner
-                  ? ""
-                  : "unselected"
-              }`}
+              className={getBtnClass("X")}
               onClick={() => handlePlayerSelection("X")}
             >
               X
             </button>
             <button
-              className={`player-button ${
-                aiMode && playerInAIMode === "O"
-                  ? "selected"
-                  : (!winner && (playerInAIMode || playerInFriendsMode)) === "O"
-                  ? "selected"
-                  : !playerInAIMode && !playerInFriendsMode && !winner
-                  ? ""
-                  : "unselected"
-              }`}
+              className={getBtnClass("O")}
               onClick={() => handlePlayerSelection("O")}
             >
               O
@@ -158,12 +220,8 @@ function Game() {
       </section>
 
       <section className="section-game">
-        <div
-          className={`game-board ${
-            winner ? `${winner.toLowerCase()}-wins` : ""
-          } ${playerInAIMode || playerInFriendsMode ? "" : "no-player"}`}
-        >
-          {board.map((value, index) => (
+        <div className={getBoardClass()}>
+          {gameState?.board.map((value, index) => (
             <Square
               key={index}
               squareNum={index}
@@ -172,27 +230,15 @@ function Game() {
             />
           ))}
         </div>
-        {winner || board.every((square) => square) ? (
-          <div className="game-result">
-            <div className="winner">
-              {`${
-                winner === null
-                  ? !aiMode
-                    ? "draw"
-                    : getRandomMessage(drawMessages)
-                  : !aiMode
-                  ? winner + " wins 🎉"
-                  : winner === playerInAIMode
-                  ? getRandomMessage(winMessages)
-                  : getRandomMessage(loseMessages)
-              }`}
-            </div>
 
+        {(gameState.winner || gameState.draw) && showResult && (
+          <div className="game-result">
+            <div className="winner">{resultMessage}</div>
             <p className="restart" onClick={handleReset}>
               Restart
             </p>
           </div>
-        ) : null}
+        )}
       </section>
 
       <Minimax />

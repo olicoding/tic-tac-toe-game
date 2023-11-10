@@ -43,26 +43,26 @@ body {
   font: normal 1.4rem/1.5 "Roboto", sans-serif;
 }
 
-.section-header {
-  width: 30vw;
-  min-width: 230px;
-  min-height: 100px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-
-  @media (min-width: 500px) {
-    align-items: center;
-    justify-content: space-between;
-  }
-}
-
 .game {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.section-header {
+  width: 25vw;
+  max-width: 240px;
+  min-height: 100px;
+  display: flex;
+  flex-direction: row;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-info {
+  color: map-get($colors, golden);
 }
 
 .game-mode,
@@ -72,8 +72,12 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
+  justify-content: flex-start;
+  gap: 15px;
+
+  .mode-options-title {
+    margin-bottom: 0.2em;
+  }
 
   .select-options-container {
     display: flex;
@@ -114,27 +118,25 @@ body {
   gap: 15px;
 
   .player-button {
-    padding: 0.1em 1em;
+    padding: 0.1em 0.8em;
     color: map-get($colors, white);
     background-color: map-get($colors, dark-grey);
     border-radius: $border-radius;
     cursor: pointer;
     display: grid;
-    transition: background-color 0.3s ease-in-out, border 0.3s ease-in-out;
+    transition: background-color 0.1s ease-in-out, border 0.2s ease-in-out,
+      opacity 0.25s ease-in-out 0.1s;
 
     &.selected {
-      border: 2px solid map-get($colors, golden);
+      outline: 1px solid map-get($colors, golden);
+      outline-offset: -2px;
       pointer-events: none;
-      transition: none;
     }
 
-    &:hover {
-      background-color: map-get($colors, golden);
-    }
-
-    &:active {
-      color: map-get($colors, dark-grey);
-      background-color: map-get($colors, golden);
+    @media (hover: hover) {
+      &:hover {
+        background-color: map-get($colors, golden);
+      }
     }
 
     &.unselected {
@@ -153,25 +155,40 @@ body {
   display: grid;
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 
-  &:hover {
-    color: map-get($colors, golden);
-  }
-
-  &:active {
-    background-color: map-get($colors, golden);
+  @media (hover: hover) {
+    &:hover {
+      color: map-get($colors, golden);
+    }
   }
 }
 
+@keyframes boardEntry {
+  0% {
+    transform: scale(0.6);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.game-board-faded,
 .game-board {
+  opacity: 0.5;
+}
+
+.game-board {
+  animation: boardEntry 0.5s ease-in-out;
   display: grid;
   margin: 1.3em auto;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   gap: 3px;
-  width: 30vw;
-  height: 30vw;
-  min-width: 180px;
-  min-height: 180px;
+  width: 50vw;
+  height: 50vw;
+  max-width: 250px;
+  max-height: 250px;
+  min-width: 220px;
+  min-height: 220px;
   color: map-get($colors, white);
   background-color: map-get($colors, black);
   border: 6px solid map-get($colors, black);
@@ -180,23 +197,15 @@ body {
   transition: box-shadow 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
 
-.game-board.no-player {
-  opacity: 0.3;
-}
-
-.game-board.x-wins {
-  box-shadow: map-get($shadows, x-wins);
-}
-
-.game-board.o-wins {
-  box-shadow: map-get($shadows, o-wins);
+.game-board-active {
+  opacity: 1;
 }
 
 .square {
   padding: 0;
   background: transparent;
   color: map-get($colors, white);
-  font-size: clamp(20px, 3vw, 50px);
+  font-size: clamp(24px, 3vw, 30px);
   font-weight: bold;
   border: 1px solid map-get($colors, grey);
   border-radius: 2px;
@@ -204,9 +213,13 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: transform 0.2s ease-in-out, background-color 0.5s ease-in-out;
 
-  &:hover {
-    background-color: map-get($colors, grey);
+  @media (hover: hover) {
+    &:hover {
+      background-color: map-get($colors, grey);
+      transform: scale(0.98);
+    }
   }
 
   &:focus {
@@ -218,4 +231,75 @@ body {
   font-size: clamp(1.6rem, 2.5vw, 2rem);
   text-align: center;
   margin: 0 0.5em;
+}
+
+@media (max-height: 450px) and (orientation: landscape) {
+  .game {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    margin: 20px auto;
+  }
+
+  .section-header {
+    padding: 0;
+    max-width: 120px;
+    min-height: 180px;
+    flex-direction: column;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: 0.5em;
+  }
+
+  .player-selection {
+    margin: 0 auto;
+    display: flex;
+    gap: 15px;
+    font-size: 12px;
+
+    .player-button {
+      padding: 0 0.5em;
+    }
+  }
+
+  .section-game {
+    min-width: 200px;
+  }
+
+  .game-info {
+    justify-content: flex-start;
+    gap: 0.3em;
+    min-height: 55px;
+  }
+
+  .game-board {
+    max-width: 130px;
+    max-height: 130px;
+    min-width: 130px;
+    min-height: 130px;
+    margin: 0 auto;
+  }
+
+  .square {
+    font-size: 16px;
+  }
+
+  .game-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2em;
+  }
+
+  .winner {
+    font-size: 1.4rem;
+    margin: 0.3em 0 0;
+    padding: 0;
+  }
+
+  .restart {
+    font-size: 1.2rem;
+  }
 }
