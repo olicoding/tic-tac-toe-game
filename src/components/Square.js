@@ -2,14 +2,18 @@ import { useContext } from "react";
 import { Context } from "../context/ContextProvider";
 
 function Square(props) {
-  const { player, friendsModePlayer, board, winner, handleUserMove } =
+  const { playerInAIMode, playerInFriendsMode, board, winner, handleUserMove } =
     useContext(Context);
 
   const { squareNum } = props;
 
   const handleClick = () => {
     try {
-      if ((player || friendsModePlayer) && !board[squareNum] && !winner) {
+      if (
+        (playerInAIMode || playerInFriendsMode) &&
+        !board[squareNum] &&
+        !winner
+      ) {
         handleUserMove(squareNum);
       }
     } catch (_) {

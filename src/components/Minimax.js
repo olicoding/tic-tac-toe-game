@@ -2,92 +2,93 @@ import { useContext, useEffect } from "react";
 import { Context } from "../context/ContextProvider";
 
 function Minimax() {
-  const { player, aiMode, board, setBoard, winner, calculateWinner } =
-    useContext(Context);
-  const computerPlayer = player === "X" ? "O" : "X";
+  const {
+    playerInAIMode,
+    currentTurn,
+    setCurrentTurn,
+    aiMode,
+    board,
+    setBoard,
+    winner,
+    calculateWinner,
+  } = useContext(Context);
 
-  const getBestMove = (newBoard, currentPlayer) => {
-    try {
-      const moves = [];
+  const aiPlayer = playerInAIMode === "X" ? "O" : "X";
 
+  const evaluateBoard = (newBoard) => {
+    const winner = calculateWinner(newBoard);
+    if (winner === aiPlayer) return 10;
+    if (winner === playerInAIMode) return -10;
+    return 0;
+  };
+
+  const minimax = (newBoard, depth, isMaximizing) => {
+    let score = evaluateBoard(newBoard);
+
+    if (score === 10) return score - depth;
+    if (score === -10) return score + depth;
+    if (newBoard.every((cell) => cell !== null)) return 0;
+
+    if (isMaximizing) {
+      let bestVal = -Infinity;
       newBoard.forEach((cell, index) => {
-        if (!cell) {
-          const child = [...newBoard];
-          child[index] = currentPlayer;
-          const score = -getBestMove(child, currentPlayer === "X" ? "O" : "X");
-          moves.push({ move: index, score });
+        if (cell === null) {
+          newBoard[index] = aiPlayer;
+          bestVal = Math.max(bestVal, minimax(newBoard, depth + 1, false));
+          newBoard[index] = null;
         }
       });
-
-      if (moves.length === 0) return 0;
-
-      if (player === "X") {
-        const maxScore = Math.max(...moves.map((move) => move.score));
-        return maxScore;
-      } else {
-        const minScore = Math.min(...moves.map((move) => move.score));
-        return minScore;
-      }
-    } catch (error) {
-      console.error("Error in getBestMove:", error.message);
+      return bestVal;
+    } else {
+      let bestVal = Infinity;
+      newBoard.forEach((cell, index) => {
+        if (cell === null) {
+          newBoard[index] = playerInAIMode;
+          bestVal = Math.min(bestVal, minimax(newBoard, depth + 1, true));
+          newBoard[index] = null;
+        }
+      });
+      return bestVal;
     }
   };
 
-  const makeComputerMove = () => {
-    try {
-      if (aiMode && !winner) {
-        const emptySquares = board.filter((cell) => cell === null);
-
-        if (emptySquares.length % 2 === 0 && !winner) {
-          const newBoard = [...board];
-
-          for (let index = 0; index < newBoard.length; index++) {
-            if (!newBoard[index]) {
-              newBoard[index] = computerPlayer;
-              if (calculateWinner(newBoard)) {
-                setBoard(newBoard);
-                return;
-              }
-              newBoard[index] = null;
-            }
-          }
-
-          for (let index = 0; index < newBoard.length; index++) {
-            if (!newBoard[index]) {
-              newBoard[index] = player;
-              if (calculateWinner(newBoard)) {
-                newBoard[index] = computerPlayer;
-                setBoard(newBoard);
-                return;
-              }
-              newBoard[index] = null;
-            }
-          }
-
-          const moves = [];
-          for (let index = 0; index < newBoard.length; index++) {
-            if (!newBoard[index]) {
-              moves.push(index);
-            }
-          }
-
-          if (moves.length > 0) {
-            const randomIndex = moves[Math.floor(Math.random() * moves.length)];
-            newBoard[randomIndex] = computerPlayer;
-            setBoard(newBoard);
-          }
+  const getBestMove = (newBoard) => {
+    let bestVal = -Infinity;
+    let bestMove = -1;
+    newBoard.forEach((cell, index) => {
+      if (cell === null) {
+        newBoard[index] = aiPlayer;
+        let moveVal = minimax(newBoard, 0, false);
+        newBoard[index] = null;
+        if (moveVal > bestVal) {
+          bestVal = moveVal;
+          bestMove = index;
         }
       }
-    } catch (error) {
-      console.error("Error in makeComputerMove:", error.message);
+    });
+    return bestMove;
+  };
+
+  const makeAiMove = () => {
+    if (aiMode && !winner && currentTurn === aiPlayer) {
+      const bestMove = getBestMove(board);
+      if (bestMove !== -1) {
+        const newBoard = [...board];
+        newBoard[bestMove] = aiPlayer;
+        setBoard(newBoard);
+        setCurrentTurn(playerInAIMode);
+      }
     }
   };
 
   useEffect(() => {
-    if (!winner) {
-      makeComputerMove();
+    if (aiMode && !winner && currentTurn === aiPlayer) {
+      const timer = setTimeout(() => {
+        makeAiMove();
+      }, 200);
+      return () => clearTimeout(timer);
     }
-  }, [board]);
+  }, [board, aiMode, winner, currentTurn]);
 
   return null;
 }

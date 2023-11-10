@@ -4,9 +4,10 @@ export const Context = createContext();
 
 function ContextProvider({ children }) {
   const [board, setBoard] = useState(Array(9).fill(null));
-  const [friendsModePlayer, setFriendsModePlayer] = useState(null);
+  const [playerInFriendsMode, setPlayerInFriendsMode] = useState(null);
+  const [playerInAIMode, setPlayerInAIMode] = useState(null);
+  const [currentTurn, setCurrentTurn] = useState(null);
   const [aiMode, setAIMode] = useState(false);
-  const [player, setPlayer] = useState(null);
   const [winner, setWinner] = useState(null);
 
   const calculateWinner = (squares) => {
@@ -43,7 +44,7 @@ function ContextProvider({ children }) {
     try {
       if (!board[squareNum] && !winner) {
         const newBoard = [...board];
-        newBoard[squareNum] = player || friendsModePlayer;
+        newBoard[squareNum] = playerInAIMode || playerInFriendsMode;
 
         const newWinner = calculateWinner(newBoard);
         if (newWinner) {
@@ -53,8 +54,12 @@ function ContextProvider({ children }) {
           setBoard(newBoard);
         }
 
-        if (friendsModePlayer)
-          setFriendsModePlayer(friendsModePlayer === "X" ? "O" : "X");
+        if (aiMode) {
+          const nextTurn = currentTurn === "X" ? "O" : "X";
+          setCurrentTurn(nextTurn);
+        } else if (playerInFriendsMode) {
+          setPlayerInFriendsMode(playerInFriendsMode === "X" ? "O" : "X");
+        }
       }
     } catch (error) {
       console.error("Error in handleUserMove:", error);
@@ -64,19 +69,21 @@ function ContextProvider({ children }) {
   useEffect(() => {
     const newWinner = calculateWinner(board);
     if (newWinner) setWinner(newWinner);
-  }, [board]);
+  }, [board, playerInAIMode, currentTurn]);
 
   return (
     <Context.Provider
       value={{
-        player,
-        setPlayer,
+        playerInAIMode,
+        setPlayerInAIMode,
         board,
         setBoard,
-        friendsModePlayer,
-        setFriendsModePlayer,
+        playerInFriendsMode,
+        setPlayerInFriendsMode,
         aiMode,
         setAIMode,
+        currentTurn,
+        setCurrentTurn,
         winner,
         setWinner,
         handleUserMove,

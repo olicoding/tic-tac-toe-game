@@ -37,23 +37,25 @@ function Game() {
     "Two forces in equilibrium! ⚖️",
   ];
   const {
-    player,
-    setPlayer,
-    friendsModePlayer,
-    setFriendsModePlayer,
-    setWinner,
     aiMode,
     setAIMode,
+    setCurrentTurn,
+    playerInAIMode,
+    setPlayerInAIMode,
+    playerInFriendsMode,
+    setPlayerInFriendsMode,
+    handleUserMove,
     board,
     setBoard,
-    handleUserMove,
     winner,
+    setWinner,
   } = useContext(Context);
 
   const handleGameModeChange = () => {
     setAIMode(!aiMode);
-    setFriendsModePlayer(null);
-    setPlayer(null);
+    setCurrentTurn(null);
+    setPlayerInFriendsMode(null);
+    setPlayerInAIMode(null);
     handleReset();
   };
 
@@ -62,10 +64,12 @@ function Game() {
       handleReset();
 
       if (aiMode) {
-        setPlayer(selectedPlayer);
+        setPlayerInAIMode(selectedPlayer);
       } else {
-        setFriendsModePlayer(selectedPlayer);
+        setPlayerInFriendsMode(selectedPlayer);
       }
+
+      setCurrentTurn(selectedPlayer);
     } catch (error) {
       console.error("Error in handlePlayerSelection:", error.message);
     }
@@ -95,7 +99,7 @@ function Game() {
               <input
                 type="radio"
                 name="gameMode"
-                value="Friend"
+                value="Friends"
                 checked={!aiMode}
                 onChange={handleGameModeChange}
               />
@@ -117,17 +121,17 @@ function Game() {
         <div className="game-info">
           {winner
             ? ""
-            : friendsModePlayer || player
+            : playerInFriendsMode || playerInAIMode
             ? "Player turn:"
             : "Choose your player"}
           <div className="player-selection">
             <button
               className={`player-button ${
-                aiMode && player === "X"
+                aiMode && playerInAIMode === "X"
                   ? "selected"
-                  : (!winner && (player || friendsModePlayer)) === "X"
+                  : (!winner && (playerInAIMode || playerInFriendsMode)) === "X"
                   ? "selected"
-                  : !player && !friendsModePlayer && !winner
+                  : !playerInAIMode && !playerInFriendsMode && !winner
                   ? ""
                   : "unselected"
               }`}
@@ -137,11 +141,11 @@ function Game() {
             </button>
             <button
               className={`player-button ${
-                aiMode && player === "O"
+                aiMode && playerInAIMode === "O"
                   ? "selected"
-                  : (!winner && (player || friendsModePlayer)) === "O"
+                  : (!winner && (playerInAIMode || playerInFriendsMode)) === "O"
                   ? "selected"
-                  : !player && !friendsModePlayer && !winner
+                  : !playerInAIMode && !playerInFriendsMode && !winner
                   ? ""
                   : "unselected"
               }`}
@@ -157,7 +161,7 @@ function Game() {
         <div
           className={`game-board ${
             winner ? `${winner.toLowerCase()}-wins` : ""
-          } ${player || friendsModePlayer ? "" : "no-player"}`}
+          } ${playerInAIMode || playerInFriendsMode ? "" : "no-player"}`}
         >
           {board.map((value, index) => (
             <Square
@@ -178,7 +182,7 @@ function Game() {
                     : getRandomMessage(drawMessages)
                   : !aiMode
                   ? winner + " wins 🎉"
-                  : winner === player
+                  : winner === playerInAIMode
                   ? getRandomMessage(winMessages)
                   : getRandomMessage(loseMessages)
               }`}
