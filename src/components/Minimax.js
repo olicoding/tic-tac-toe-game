@@ -54,7 +54,8 @@ function Minimax() {
 
   const getBestMove = (newBoard) => {
     let bestVal = -Infinity;
-    let bestMove = -1;
+    let bestMoves = [];
+
     newBoard.forEach((cell, index) => {
       if (cell === null) {
         newBoard[index] = aiPlayer;
@@ -62,11 +63,13 @@ function Minimax() {
         newBoard[index] = null;
         if (moveVal > bestVal) {
           bestVal = moveVal;
-          bestMove = index;
+          bestMoves = [index];
+        } else if (moveVal === bestVal) {
+          bestMoves.push(index);
         }
       }
     });
-    return bestMove;
+    return bestMoves[Math.floor(Math.random() * bestMoves.length)];
   };
 
   const makeAiMove = () => {
