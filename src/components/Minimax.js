@@ -14,9 +14,9 @@ function Minimax() {
 
   const evaluateBoard = (newBoard) => {
     try {
-      const winner = calculateWinner(newBoard);
-      if (winner === aiPlayer) return 10;
-      if (winner === gameState.playerInAIMode) return -10;
+      const result = calculateWinner(newBoard);
+      if (result.winner === aiPlayer) return 10;
+      if (result.winner === gameState.playerInAIMode) return -10;
       return 0;
     } catch (error) {
       console.error("Error in evaluateBoard:", error.message);

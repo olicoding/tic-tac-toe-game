@@ -5,6 +5,25 @@ function Square(props) {
   const { gameState, handleUserMove } = useContext(Context);
   const { squareNum } = props;
 
+  const isWinningSquare = gameState.winningLine.includes(squareNum);
+
+  const getShadowClass = () => {
+    try {
+      if (!isWinningSquare) return "";
+
+      if (gameState.aiMode) {
+        return gameState.winner === gameState.playerInAIMode
+          ? "player-wins"
+          : "ai-wins";
+      } else {
+        return "player-wins";
+      }
+    } catch (error) {
+      console.error("Error in Square getShadowClass:", error.message);
+      return "";
+    }
+  };
+
   const handleClick = () => {
     try {
       if (
@@ -19,8 +38,10 @@ function Square(props) {
     }
   };
 
+  const squareClass = `square ${getShadowClass()}`;
+
   return (
-    <button className="square" onClick={handleClick}>
+    <button className={squareClass} onClick={handleClick}>
       {gameState.board[squareNum]}
     </button>
   );

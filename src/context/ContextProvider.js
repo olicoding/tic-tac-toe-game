@@ -6,6 +6,7 @@ function ContextProvider({ children }) {
   const [isGameReady, setIsGameReady] = useState(false);
   const [gameState, setGameState] = useState({
     board: Array(9).fill(null),
+    winningLine: [],
     winner: null,
     draw: false,
     playerInFriendsMode: null,
@@ -35,12 +36,13 @@ function ContextProvider({ children }) {
           squares[a] === squares[b] &&
           squares[a] === squares[c]
         ) {
-          return squares[a];
+          return { winner: squares[a], winningLine: line };
         }
       }
-      return null;
+      return { winner: null, winningLine: [] };
     } catch (error) {
       console.error("Error in calculateWinner:", error.message);
+      return { winner: null, winningLine: [] };
     }
   };
 
@@ -50,17 +52,20 @@ function ContextProvider({ children }) {
         const newBoard = [...gameState.board];
         newBoard[squareNum] = gameState.currentTurn;
         const nextTurn = gameState.currentTurn === "X" ? "O" : "X";
-        const newWinner = calculateWinner(newBoard);
-        const isDraw = !newWinner && newBoard.every((cell) => cell !== null);
+        const newResult = calculateWinner(newBoard);
+        const isDraw =
+          !newResult.winner && newBoard.every((cell) => cell !== null);
 
         setGameState({
           ...gameState,
           board: newBoard,
           draw: isDraw,
-          winner: newWinner,
-          currentTurn: newWinner || isDraw ? gameState.currentTurn : nextTurn,
+          winner: newResult.winner,
+          winningLine: newResult.winningLine,
+          currentTurn:
+            newResult.winner || isDraw ? gameState.currentTurn : nextTurn,
           playerInFriendsMode:
-            !gameState.aiMode && !newWinner
+            !gameState.aiMode && !newResult.winner
               ? nextTurn
               : gameState.playerInFriendsMode,
         });
@@ -75,6 +80,7 @@ function ContextProvider({ children }) {
       ...prevState,
       level: difficulty,
       board: Array(9).fill(null),
+      winningLine: [],
       winner: null,
       draw: false,
     }));
@@ -125,6 +131,7 @@ function ContextProvider({ children }) {
       setGameState((prevState) => ({
         ...prevState,
         board: Array(9).fill(null),
+        winningLine: [],
         winner: null,
         draw: false,
       }));
@@ -135,12 +142,13 @@ function ContextProvider({ children }) {
 
   useEffect(() => {
     if (!gameState.winner && !gameState.draw) {
-      const newWinner = calculateWinner(gameState.board);
+      const newResult = calculateWinner(gameState.board);
 
-      if (newWinner && newWinner !== gameState.winner) {
+      if (newResult.winner && newResult.winner !== gameState.winner) {
         setGameState((prevState) => ({
           ...prevState,
-          winner: newWinner,
+          winner: newResult.winner,
+          winningLine: newResult.winningLine,
         }));
       }
     }

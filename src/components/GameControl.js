@@ -11,7 +11,8 @@ function GameControl() {
   } = useContext(Context);
 
   const levelButtonsVisible = gameState.aiMode;
-  const playerButtonsVisible = gameState.aiMode !== null;
+  const playerButtonsVisible =
+    (gameState.aiMode && gameState.level) || gameState.aiMode === false;
 
   const handleGameModeSelection = (mode) => {
     handleGameMode(mode === "AI");
@@ -27,7 +28,7 @@ function GameControl() {
   };
 
   const handlePlayerChoice = (player) => {
-    if (gameState.aiMode === null && (gameState.aiMode || !gameState.level)) {
+    if (gameState.aiMode && gameState.level === null) {
       return;
     }
 
@@ -58,17 +59,15 @@ function GameControl() {
         case "player":
           if (
             gameState.currentTurn === value &&
-            (gameState.aiMode === false ||
-              (gameState.aiMode && gameState.level))
+            (!gameState.aiMode || (gameState.aiMode && gameState.level))
           ) {
             classes += "selected ";
           } else if (
-            (gameState.aiMode === false ||
-              (gameState.aiMode && gameState.level)) &&
+            (!gameState.aiMode || (gameState.aiMode && gameState.level)) &&
             gameState.currentTurn !== null
           ) {
             classes += "faded ";
-          } else if (gameState.aiMode && !gameState.level) {
+          } else if (gameState.aiMode && gameState.level === null) {
             classes += "faded ";
           }
           break;

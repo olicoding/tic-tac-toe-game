@@ -13,8 +13,8 @@ $colors: (
 
 $shadows: (
   default: 0 0 17px rgba(255, 255, 255, 0.5),
-  ai-wins: 0 0 30px rgba(226, 199, 140, 1),
-  player-wins: 0 0 30px rgba(51, 204, 51, 0.8),
+  player-wins: 0 0 20px rgba(226, 199, 140, 1),
+  ai-wins: 0 0 20px rgba(51, 204, 51, 1),
 );
 
 $border-radius: 5px;
@@ -59,7 +59,13 @@ body {
   width: 100vw;
   background-color: map-get($colors, tone);
   color: map-get($colors, grey);
-  font: normal 1.2rem/1.5 "Roboto", sans-serif;
+  font: normal 1.2rem/2 "Roboto", sans-serif;
+
+  &::-webkit-scrollbar {
+    display: none;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 .faded {
@@ -99,17 +105,20 @@ body {
 }
 
 .game {
-  padding: 20px 10px;
+  margin: 0.2em auto 0;
+  padding: 10px 10px 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 0.5em;
+  width: 100%;
+  min-width: fit-content;
+  max-width: 100vw;
 
   .game-board {
-    min-width: 200px;
-    min-height: 200px;
-    max-width: 240px;
-    max-height: 240px;
+    width: 180px;
+    height: 180px;
   }
 }
 
@@ -165,7 +174,7 @@ body {
   padding: 0;
   background: transparent;
   color: map-get($colors, white);
-  font-size: clamp(20px, 5vw, 26px);
+  font-size: clamp(16px, 3.5vw, 24px);
   font-weight: bold;
   border: 1px solid map-get($colors, grey);
   border-radius: 2px;
@@ -175,10 +184,11 @@ body {
   cursor: pointer;
   transition: transform 0.2s ease-in-out, background-color 0.5s ease-in-out;
 
-  &:hover,
-  &:focus {
-    background-color: map-get($colors, grey);
-    transform: scale(0.98);
+  @media (hover: hover) {
+    &:hover {
+      background-color: map-get($colors, grey);
+      transform: scale(0.98);
+    }
   }
 }
 
@@ -195,6 +205,14 @@ body {
   text-align: center;
 }
 
+.ai-wins {
+  box-shadow: map-get($shadows, ai-wins);
+}
+
+.player-wins {
+  box-shadow: map-get($shadows, player-wins);
+}
+
 .restart {
   @include button-style;
   padding: 0.1em 0.8em;
@@ -203,35 +221,41 @@ body {
 
 @media (max-height: 450px) and (orientation: landscape) {
   .game {
-    padding: 0;
-
+    gap: 1em;
     flex-direction: row;
-    justify-content: flex-start;
-    align-items: flex-start;
-
-    gap: 2em;
-    width: 450px;
-    margin: 0 auto;
+    justify-content: space-around;
+    align-items: center;
+    width: 100vw;
+    max-width: 550px;
 
     .game-board {
-      min-width: 180px;
-      min-height: 180px;
-      max-width: 200px;
-      max-height: 200px;
+      width: 160px;
+      height: 160px;
     }
   }
 
   .game-control {
-    position: relative;
-    top: 50%;
-    transform: translateY(50%);
-    padding: 1em 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1em;
+    gap: 1.2em;
     width: 100%;
-    min-width: 150px;
-    max-width: 200px;
+    max-width: 240px;
+  }
+
+  .square {
+    font-size: clamp(14px, 3vw, 18px);
+  }
+
+  .game-result {
+    gap: 0.2em;
+  }
+
+  .winner,
+  .restart {
+    padding: 0.2em 0.8em;
+    line-height: 1.5;
+    font-size: 1.5rem;
+  }
+
+  .restart {
+    line-height: 1.2;
   }
 }

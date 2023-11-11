@@ -50,6 +50,7 @@ function Game() {
       setGameState((prevState) => ({
         ...prevState,
         board: Array(9).fill(null),
+        winningLine: [],
         winner: null,
         draw: false,
       }));
@@ -62,7 +63,7 @@ function Game() {
     try {
       let classNames = "game-board";
 
-      if (!isGameReady) {
+      if (!isGameReady || gameState.winner || gameState.draw) {
         classNames += " faded";
       } else {
         classNames += " game-board-active ";
@@ -120,21 +121,27 @@ function Game() {
   }, [gameState.winner, gameState.draw]);
 
   return (
-    <article className="game">
-      <GameControl />
+    <>
+      <section className="game">
+        <GameControl />
 
-      <section className="section-game">
-        <div className={getBoardClass()}>
-          {gameState?.board.map((value, index) => (
-            <Square
-              key={index}
-              squareNum={index}
-              value={value}
-              onClick={handleUserMove}
-            />
-          ))}
+        <div className="board-wrapper">
+          <div className={getBoardClass()}>
+            {gameState?.board.map((value, index) => (
+              <Square
+                key={index}
+                squareNum={index}
+                value={value}
+                onClick={handleUserMove}
+              />
+            ))}
+          </div>
         </div>
 
+        <Minimax />
+      </section>
+
+      <section className="section-results">
         {(gameState.winner || gameState.draw) && showResult && (
           <div className="game-result">
             <div className="winner">{resultMessage}</div>
@@ -150,9 +157,7 @@ function Game() {
           </div>
         )}
       </section>
-
-      <Minimax />
-    </article>
+    </>
   );
 }
 
