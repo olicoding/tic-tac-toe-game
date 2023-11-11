@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { Context } from "../context/ContextProvider";
+import GameControl from "./GameControl";
 import Square from "./Square";
 import Minimax from "./Minimax";
 
@@ -37,39 +38,12 @@ function Game() {
     "Two forces in equilibrium! ⚖️",
   ];
 
-  const { gameState, setGameState, handleUserMove } = useContext(Context);
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const { isGameReady, gameState, setGameState, handleUserMove } =
+    useContext(Context);
   const [resultMessage, setResultMessage] = useState("");
   const [showResult, setShowResult] = useState(false);
 
-  const handlePlayerSelection = (selectedPlayer) => {
-    try {
-      handleReset();
-      setGameState((prevState) => ({
-        ...prevState,
-        currentTurn: selectedPlayer,
-        playerInAIMode: prevState.aiMode ? selectedPlayer : null,
-        playerInFriendsMode: !prevState.aiMode ? selectedPlayer : null,
-      }));
-    } catch (error) {
-      console.error("Error in handlePlayerSelection:", error.message);
-    }
-  };
-
-  const handleGameMode = () => {
-    try {
-      handleReset();
-      setGameState((prevState) => ({
-        ...prevState,
-        currentTurn: null,
-        playerInAIMode: null,
-        playerInFriendsMode: null,
-        aiMode: !prevState.aiMode,
-      }));
-    } catch (error) {
-      console.error("Error in handleGameMode:", error.message);
-    }
-  };
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const handleReset = () => {
     try {
@@ -84,47 +58,14 @@ function Game() {
     }
   };
 
-  const getGameInfo = () => {
-    try {
-      if (gameState.winner || gameState.draw) return "";
-
-      return gameState.playerInFriendsMode || gameState.playerInAIMode
-        ? ""
-        : "Choose a player";
-    } catch (error) {
-      console.error("Error in getGameInfo:", error.message);
-      return "";
-    }
-  };
-
-  const getBtnClass = (player) => {
-    try {
-      const isSelected =
-        (gameState.aiMode && gameState.playerInAIMode === player) ||
-        (!gameState.winner &&
-          (gameState.playerInAIMode || gameState.playerInFriendsMode) ===
-            player);
-      const isUnselected =
-        !gameState.playerInAIMode &&
-        !gameState.playerInFriendsMode &&
-        !gameState.winner;
-      return `player-button ${
-        isSelected ? "selected" : isUnselected ? "" : "unselected"
-      }`;
-    } catch (error) {
-      console.error("Error in getBtnClass:", error.message);
-      return "";
-    }
-  };
-
   const getBoardClass = () => {
     try {
       let classNames = "game-board";
 
-      if (gameState.winner || gameState.draw) {
-        classNames += " game-board-faded";
-      } else if (gameState.playerInAIMode || gameState.playerInFriendsMode) {
-        classNames += " game-board-active";
+      if (!isGameReady) {
+        classNames += " faded";
+      } else {
+        classNames += " game-board-active ";
       }
 
       return classNames;
@@ -141,6 +82,13 @@ function Game() {
     } catch (error) {
       console.error("Error in getRandomMessage:", error.message);
       return "";
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleReset();
     }
   };
 
@@ -173,51 +121,7 @@ function Game() {
 
   return (
     <article className="game">
-      <section className="section-header">
-        <div className="game-mode">
-          <div className="select-options-container">
-            <p className="mode-options-title"> Play against:</p>
-            <label>
-              <input
-                type="radio"
-                name="gameMode"
-                value="Friends"
-                checked={!gameState.aiMode}
-                onChange={handleGameMode}
-              />
-              Friend
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="gameMode"
-                value="AI"
-                checked={gameState.aiMode}
-                onChange={handleGameMode}
-              />
-              AI
-            </label>
-          </div>
-        </div>
-
-        <div className="game-info">
-          <div className="game-info-title">{getGameInfo()}</div>
-          <div className="player-selection">
-            <button
-              className={getBtnClass("X")}
-              onClick={() => handlePlayerSelection("X")}
-            >
-              X
-            </button>
-            <button
-              className={getBtnClass("O")}
-              onClick={() => handlePlayerSelection("O")}
-            >
-              O
-            </button>
-          </div>
-        </div>
-      </section>
+      <GameControl />
 
       <section className="section-game">
         <div className={getBoardClass()}>
@@ -234,8 +138,14 @@ function Game() {
         {(gameState.winner || gameState.draw) && showResult && (
           <div className="game-result">
             <div className="winner">{resultMessage}</div>
-            <p className="restart" onClick={handleReset}>
-              Restart
+            <p
+              className="restart"
+              onClick={handleReset}
+              onKeyDown={(e) => handleKeyDown(e)}
+              tabIndex="0"
+              role="button"
+            >
+              RESTART
             </p>
           </div>
         )}

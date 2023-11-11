@@ -13,11 +13,30 @@ $colors: (
 
 $shadows: (
   default: 0 0 17px rgba(255, 255, 255, 0.5),
-  x-wins: 0 0 30px rgba(226, 199, 140, 1),
-  o-wins: 0 0 30px rgba(51, 204, 51, 0.8),
+  ai-wins: 0 0 30px rgba(226, 199, 140, 1),
+  player-wins: 0 0 30px rgba(51, 204, 51, 0.8),
 );
 
 $border-radius: 5px;
+
+@mixin button-style {
+  padding: 0.2em auto;
+  font-size: 1.2rem;
+  color: map-get($colors, white);
+  background-color: map-get($colors, dark-grey);
+  border-radius: $border-radius;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.1s ease-in-out, border 0.2s ease-in-out,
+    opacity 0.25s ease-in-out 0.1s;
+
+  @media (hover: hover) {
+    &:hover {
+      color: map-get($colors, dark-grey);
+      background-color: map-get($colors, golden);
+    }
+  }
+}
 
 *,
 *::before,
@@ -40,60 +59,126 @@ body {
   width: 100vw;
   background-color: map-get($colors, tone);
   color: map-get($colors, grey);
-  font: normal 1.4rem/1.5 "Roboto", sans-serif;
+  font: normal 1.2rem/1.5 "Roboto", sans-serif;
+}
+
+.faded {
+  opacity: 0.3;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.transition-opacity {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.visible {
+  opacity: 1;
+}
+
+.collapsible-container {
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+  max-height: 0;
+  width: 100%;
+
+  &.expanded {
+    max-height: 100px;
+  }
+}
+
+.game-board-active {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.selected {
+  outline: 1px solid map-get($colors, golden);
+  outline-offset: -2px;
+  pointer-events: unset;
 }
 
 .game {
+  padding: 20px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  .game-board {
+    min-width: 200px;
+    min-height: 200px;
+    max-width: 240px;
+    max-height: 240px;
+  }
 }
 
-.section-header {
-  width: 25vw;
-  max-width: 240px;
-  min-height: 100px;
+.game-control {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-}
-
-.game-info {
-  color: map-get($colors, golden);
+  gap: 0.6em;
+  min-width: 200px;
+  width: 240px;
+  max-width: 80vw;
 }
 
 .game-mode,
-.game-info {
-  min-height: 70px;
-  min-width: 120px;
+.level-selection,
+.player-selection {
   display: flex;
-  flex-direction: column;
+  width: 100%;
+  justify-content: space-between;
+  gap: 3px;
+
+  button {
+    flex: 1;
+    @include button-style;
+  }
+}
+
+.mode-button,
+.player-button,
+.level-button {
+  @include button-style;
+}
+
+.game-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 3px;
+  width: 80vw;
+  height: 80vw;
+  max-width: 300px;
+  max-height: 300px;
+  margin: 1.3em auto;
+  color: map-get($colors, white);
+  background-color: map-get($colors, black);
+  border: 6px solid map-get($colors, black);
+  border-radius: $border-radius;
+  box-shadow: map-get($shadows, default);
+  transition: box-shadow 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.square {
+  padding: 0;
+  background: transparent;
+  color: map-get($colors, white);
+  font-size: clamp(20px, 5vw, 26px);
+  font-weight: bold;
+  border: 1px solid map-get($colors, grey);
+  border-radius: 2px;
+  display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 15px;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, background-color 0.5s ease-in-out;
 
-  .mode-options-title {
-    margin-bottom: 0.2em;
-  }
-
-  .select-options-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-  }
-
-  label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-
-    input {
-      margin-right: 0.3em;
-    }
+  &:hover,
+  &:focus {
+    background-color: map-get($colors, grey);
+    transform: scale(0.98);
   }
 }
 
@@ -105,199 +190,48 @@ body {
   gap: 0.5em;
 }
 
-.restart {
-  font-size: clamp(1.8rem, 2.5vw, 3rem);
-  width: fit-content;
-  margin: 0 auto;
-}
-
-.player-selection {
-  margin: 0 auto;
-  display: flex;
-  gap: 15px;
-
-  .player-button {
-    padding: 0.1em 0.8em;
-    color: map-get($colors, white);
-    background-color: map-get($colors, dark-grey);
-    border-radius: $border-radius;
-    cursor: pointer;
-    display: grid;
-    transition: background-color 0.1s ease-in-out, border 0.2s ease-in-out,
-      opacity 0.25s ease-in-out 0.1s;
-
-    &.selected {
-      outline: 1px solid map-get($colors, golden);
-      outline-offset: -2px;
-      pointer-events: none;
-    }
-
-    @media (hover: hover) {
-      &:hover {
-        background-color: map-get($colors, golden);
-      }
-    }
-
-    &.unselected {
-      opacity: 0.2;
-    }
-  }
-}
-
-.restart {
-  padding: 0.1em 0.8em;
-  font-size: clamp(1.6rem, 2.5vw, 1.6rem);
-  color: map-get($colors, white);
-  background-color: map-get($colors, dark-grey);
-  border-radius: $border-radius;
-  cursor: pointer;
-  display: grid;
-  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
-
-  @media (hover: hover) {
-    &:hover {
-      color: map-get($colors, golden);
-    }
-  }
-}
-
-@keyframes boardEntry {
-  0% {
-    transform: scale(0.6);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.game-board-faded,
-.game-board {
-  opacity: 0.5;
-}
-
-.game-board {
-  animation: boardEntry 0.5s ease-in-out;
-  display: grid;
-  margin: 1.3em auto;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 3px;
-  width: 50vw;
-  height: 50vw;
-  max-width: 250px;
-  max-height: 250px;
-  min-width: 220px;
-  min-height: 220px;
-  color: map-get($colors, white);
-  background-color: map-get($colors, black);
-  border: 6px solid map-get($colors, black);
-  border-radius: 8px;
-  box-shadow: map-get($shadows, default);
-  transition: box-shadow 0.3s ease-in-out, opacity 0.3s ease-in-out;
-}
-
-.game-board-active {
-  opacity: 1;
-}
-
-.square {
-  padding: 0;
-  background: transparent;
-  color: map-get($colors, white);
-  font-size: clamp(24px, 3vw, 30px);
-  font-weight: bold;
-  border: 1px solid map-get($colors, grey);
-  border-radius: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out, background-color 0.5s ease-in-out;
-
-  @media (hover: hover) {
-    &:hover {
-      background-color: map-get($colors, grey);
-      transform: scale(0.98);
-    }
-  }
-
-  &:focus {
-    outline: none;
-  }
-}
-
 .winner {
-  font-size: clamp(1.6rem, 2.5vw, 2rem);
+  font-size: clamp(1.6rem, 3vw, 2rem);
   text-align: center;
-  margin: 0 0.5em;
+}
+
+.restart {
+  @include button-style;
+  padding: 0.1em 0.8em;
+  font-size: clamp(1.3rem, 3vw, 1.5rem);
 }
 
 @media (max-height: 450px) and (orientation: landscape) {
   .game {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: center;
-    width: 100%;
-    margin: 20px auto;
-  }
-
-  .section-header {
     padding: 0;
-    max-width: 120px;
-    min-height: 180px;
-    flex-direction: column;
+
+    flex-direction: row;
     justify-content: flex-start;
-    gap: 0.5em;
-  }
+    align-items: flex-start;
 
-  .player-selection {
+    gap: 2em;
+    width: 450px;
     margin: 0 auto;
-    display: flex;
-    gap: 15px;
-    font-size: 12px;
 
-    .player-button {
-      padding: 0 0.5em;
+    .game-board {
+      min-width: 180px;
+      min-height: 180px;
+      max-width: 200px;
+      max-height: 200px;
     }
   }
 
-  .section-game {
-    min-width: 200px;
-  }
-
-  .game-info {
-    justify-content: flex-start;
-    gap: 0.3em;
-    min-height: 55px;
-  }
-
-  .game-board {
-    max-width: 130px;
-    max-height: 130px;
-    min-width: 130px;
-    min-height: 130px;
-    margin: 0 auto;
-  }
-
-  .square {
-    font-size: 16px;
-  }
-
-  .game-result {
+  .game-control {
+    position: relative;
+    top: 50%;
+    transform: translateY(50%);
+    padding: 1em 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 0.2em;
-  }
-
-  .winner {
-    font-size: 1.4rem;
-    margin: 0.3em 0 0;
-    padding: 0;
-  }
-
-  .restart {
-    font-size: 1.2rem;
+    gap: 1em;
+    width: 100%;
+    min-width: 150px;
+    max-width: 200px;
   }
 }

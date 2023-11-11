@@ -5,6 +5,12 @@ function Minimax() {
   const { gameState, setGameState, calculateWinner } = useContext(Context);
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   const aiPlayer = gameState.playerInAIMode === "X" ? "O" : "X";
+  const depthLimits = {
+    easy: 3,
+    medium: 5,
+    hard: 7,
+  };
+  const depthLimit = depthLimits[gameState.level];
 
   const evaluateBoard = (newBoard) => {
     try {
@@ -20,6 +26,7 @@ function Minimax() {
 
   const minimax = (newBoard, depth, isMaximizing) => {
     try {
+      if (depth >= depthLimit) return 0;
       let score = evaluateBoard(newBoard);
 
       if (score === 10) return score - depth;
@@ -85,7 +92,8 @@ function Minimax() {
         !gameState.winner &&
         gameState.currentTurn === aiPlayer
       ) {
-        await delay(500);
+        await delay(700);
+
         const bestMove = getBestMove(gameState.board);
         if (bestMove !== -1) {
           const newBoard = [...gameState.board];
