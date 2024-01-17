@@ -157,10 +157,10 @@ function ContextProvider({ children }) {
   return (
     <Context.Provider
       value={{
-        isGameReady,
-        setIsGameReady,
         gameState,
+        isGameReady,
         setGameState,
+        setIsGameReady,
         handleGameMode,
         handleUserMove,
         calculateWinner,

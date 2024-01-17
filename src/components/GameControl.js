@@ -6,8 +6,8 @@ function GameControl() {
     gameState,
     setIsGameReady,
     handleGameMode,
-    handlePlayerSelection,
     handleLevelChange,
+    handlePlayerSelection,
   } = useContext(Context);
 
   const levelButtonsVisible = gameState.aiMode;
